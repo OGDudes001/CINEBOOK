@@ -119,15 +119,16 @@ export default function AdminPanel() {
 
           </div>
 
-          {/* Logout Button */}
+          {/* Logout Button using variant="primary" */}
           <div 
             className={`opacity-0 ${isVisible ? "animate-up" : ""}`}
             style={{ animationDelay: "400ms" }}
           >
             <Button
               type="button"
+              variant="primary"
               onClick={handleLogout}
-              className="bg-red-600/20 hover:bg-red-600 border border-red-600/40 text-red-400 hover:text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 shadow-lg"
+              className="flex items-center gap-2 py-2.5 px-5 shadow-lg"
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
@@ -310,7 +311,8 @@ export default function AdminPanel() {
             <div className="pt-4 flex justify-end">
               <Button
                 type="submit"
-                className="w-full sm:w-auto px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 transition-all duration-200"
+                variant="primary"
+                className="w-full sm:w-auto px-8 py-3 flex items-center justify-center gap-2 shadow-lg shadow-red-600/30"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Publish Movie</span>

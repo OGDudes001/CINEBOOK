@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useNavigate } from "react-router"; // Use "react-router" for v7
-import { Calendar, Armchair, MapPin } from "lucide-react";
+import { Calendar, Armchair, MapPin, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MovieCardProps {
@@ -13,6 +14,8 @@ interface MovieCardProps {
   totalSeats: number;
   location: string;
   status?: "Available" | "Sold Out" | "Coming Soon";
+  isFavorite?: boolean;
+  onToggleFavorite?: (id: string | number, isFav: boolean) => void;
   onViewDetails?: () => void;
 }
 
@@ -27,9 +30,21 @@ export function MovieCard({
   totalSeats,
   location,
   status = "Available",
+  isFavorite = false,
+  onToggleFavorite,
   onViewDetails,
 }: MovieCardProps) {
   const navigate = useNavigate();
+  const [fav, setFav] = useState(isFavorite);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevents triggering card navigation
+    const nextState = !fav;
+    setFav(nextState);
+    if (onToggleFavorite) {
+      onToggleFavorite(id, nextState);
+    }
+  };
 
   const handleViewDetails = () => {
     if (onViewDetails) onViewDetails();
@@ -38,13 +53,29 @@ export function MovieCard({
 
   return (
     <div className="w-full max-w-[280px] bg-[#11161d] border border-gray-800 rounded-2xl overflow-hidden shadow-lg flex flex-col text-white">
-      {/* Poster Image & Status Badge */}
-      <div className="relative w-full h-[180px] overflow-hidden">
+      {/* Poster Image & Badges */}
+      <div className="relative w-full h-[180px] overflow-hidden group">
         <img
           src={image}
           alt={title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
+
+        {/* Favorite Button (Top-Left) */}
+        <button
+          type="button"
+          onClick={handleFavoriteClick}
+          aria-label={fav ? "Remove from favorites" : "Add to favorites"}
+          className="absolute top-3 left-3 p-2 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/10 text-white transition-all duration-200 active:scale-90"
+        >
+          <Heart
+            className={`w-4 h-4 transition-colors ${
+              fav ? "fill-red-600 text-red-600" : "text-white hover:text-red-400"
+            }`}
+          />
+        </button>
+
+        {/* Status Badge (Top-Right) */}
         <div className="absolute top-3 right-3">
           <span className="bg-emerald-600/90 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md backdrop-blur-sm">
             {status}
