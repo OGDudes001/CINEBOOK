@@ -12,8 +12,7 @@ import {
 } from "lucide-react";
 import { 
   NotificationCard, 
-  type NotificationCardProps, 
-  type NotificationCategory 
+  type NotificationCardProps 
 } from "@/components/ui/notification-card";
 
 // Extends card props to track read state internally
@@ -121,7 +120,6 @@ export function NotificationsSection1() {
     return () => observer.disconnect();
   }, []);
 
-  // Calculate unread counts for sidebar badges
   const getUnreadCount = (categoryLabel: CategoryLabel) => {
     if (categoryLabel === "All Notifications") {
       return notifications.filter((n) => !n.isRead).length;
@@ -129,7 +127,6 @@ export function NotificationsSection1() {
     return notifications.filter((n) => n.categoryFilter === categoryLabel && !n.isRead).length;
   };
 
-  // Mark all currently visible or all notifications as read
   const handleMarkAllAsRead = () => {
     setNotifications((prev) =>
       prev.map((item) => ({
@@ -139,7 +136,6 @@ export function NotificationsSection1() {
     );
   };
 
-  // Filter list by selected sidebar tab
   const filteredNotifications = notifications.filter((item) => {
     if (activeCategory === "All Notifications") return true;
     return item.categoryFilter === activeCategory;
@@ -246,7 +242,6 @@ export function NotificationsSection1() {
                     icon={notif.icon}
                     isRead={notif.isRead}
                     onClick={() => {
-                      // Mark individual notification as read on click
                       setNotifications((prev) =>
                         prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n))
                       );
@@ -256,7 +251,6 @@ export function NotificationsSection1() {
               ))}
             </div>
           ) : (
-            /* Empty State */
             <div className="py-20 text-center space-y-2 bg-[#12171f]/50 rounded-2xl border border-gray-800/50">
               <p className="text-gray-400 text-sm">No notifications found in this category.</p>
             </div>
