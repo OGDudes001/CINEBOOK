@@ -1,8 +1,25 @@
-import { useEffect, useRef, useState } from "react";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { TransactionCard, type TransactionCardProps } from "@/components/ui/transaction-card";
-// Mock transaction data matching your mockup
-const MOCK_TRANSACTIONS: TransactionCardProps[] = [
+import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { Search, ChevronLeft, ChevronRight, X, Ticket, Calendar, MapPin, Clock, CreditCard } from "lucide-react";
+import { TransactionCard } from "@/components/ui/transaction-card";
+
+type TransactionCardItemProps = ComponentProps<typeof TransactionCard>;
+
+type Transaction = TransactionCardItemProps & {
+  id: string;
+  title: string;
+  image: string;
+  date: string;
+  time: string;
+  location: string;
+  genres: string[];
+  refCode: string;
+  seats: string[];
+  paymentMethod: string;
+  amount: number;
+  status: string;
+};
+
+const MOCK_TRANSACTIONS: Transaction[] = [
   {
     id: "1",
     title: "Demon Slayer: Infinity Castle",
@@ -71,7 +88,7 @@ const MOCK_TRANSACTIONS: TransactionCardProps[] = [
     seats: ["D9", "D10"],
     paymentMethod: "GCash",
     amount: 300.0,
-    status: "Pending", // Displays as 'Upcoming'
+    status: "Pending",
   },
 ];
 
@@ -82,6 +99,7 @@ export function TransactionsSection1() {
   const [activeTab, setActiveTab] = useState<TabType>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedTicket, setSelectedTicket] = useState<Transaction | null>(null);
   const totalPages = 3;
 
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -105,15 +123,12 @@ export function TransactionsSection1() {
     return () => observer.disconnect();
   }, []);
 
-  // Filter transactions based on tab and search query
   const filteredTransactions = MOCK_TRANSACTIONS.filter((item) => {
-    // Status Filter
     let matchesTab = true;
     if (activeTab === "Upcoming") matchesTab = item.status === "Pending";
     else if (activeTab === "Completed") matchesTab = item.status === "Completed";
     else if (activeTab === "Cancelled") matchesTab = item.status === "Cancelled";
 
-    // Search Filter
     const query = searchQuery.toLowerCase().trim();
     const matchesSearch =
       item.title.toLowerCase().includes(query) ||
@@ -125,7 +140,7 @@ export function TransactionsSection1() {
   return (
     <section
       ref={sectionRef}
-      className="w-full bg-[#0b0e13] text-white py-10 px-6 md:px-12"
+      className="w-full bg-[#0b0e13] text-white py-10 px-6 md:px-12 relative"
     >
       <style>{`
         @keyframes fadeInUpCard {
@@ -144,11 +159,8 @@ export function TransactionsSection1() {
       `}</style>
 
       <div className="container mx-auto space-y-6">
-        
         {/* Top Controls: Status Tabs + Search Input */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-          
-          {/* Status Filter Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
             {TABS.map((tab) => {
               const isActive = activeTab === tab;
@@ -168,7 +180,6 @@ export function TransactionsSection1() {
             })}
           </div>
 
-          {/* Search Input Box */}
           <div className="relative w-full sm:w-80 flex items-center">
             <Search className="absolute left-3.5 w-4 h-4 text-gray-400" />
             <input
@@ -179,7 +190,6 @@ export function TransactionsSection1() {
               className="w-full bg-[#12171f] border border-gray-800 rounded-full py-2 pl-10 pr-4 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-600 transition"
             />
           </div>
-
         </div>
 
         {/* Transactions List */}
@@ -188,33 +198,17 @@ export function TransactionsSection1() {
             {filteredTransactions.map((tx, index) => (
               <div
                 key={tx.id}
-                className={`w-full opacity-0 ${
+                onClick={() => setSelectedTicket(tx)}
+                className={`w-full opacity-0 cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99] ${
                   isVisible ? "animate-card-up" : ""
                 }`}
                 style={{ animationDelay: `${index * 80}ms` }}
               >
-                <TransactionCard
-                  id={tx.id}
-                  image={tx.image}
-                  title={tx.title}
-                  date={tx.date}
-                  time={tx.time}
-                  location={tx.location}
-                  genres={tx.genres}
-                  refCode={tx.refCode}
-                  seats={tx.seats}
-                  paymentMethod={tx.paymentMethod}
-                  amount={tx.amount}
-                  status={tx.status}
-                  onViewTicket={() => {
-                    // Open Ticket Modal or Details
-                  }}
-                />
+                <TransactionCard {...tx} />
               </div>
             ))}
           </div>
         ) : (
-          /* Empty State */
           <div className="py-20 text-center space-y-2 bg-[#12171f]/50 rounded-2xl border border-gray-800/50">
             <p className="text-gray-400 text-sm">No transactions found.</p>
           </div>
@@ -256,8 +250,111 @@ export function TransactionsSection1() {
             </button>
           </div>
         )}
-
       </div>
+
+      {/* Ticket Details Popup Modal */}
+      {selectedTicket && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all"
+          onClick={() => setSelectedTicket(null)}
+        >
+          <div
+            className="relative w-full max-w-md bg-[#12171f] border border-gray-800 rounded-2xl p-6 shadow-2xl space-y-6 animate-card-up overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+              <div className="flex items-center gap-2 text-red-500 font-semibold text-sm">
+                <Ticket className="w-4 h-4" />
+                <span>Ticket Details</span>
+              </div>
+              <button
+                onClick={() => setSelectedTicket(null)}
+                className="p-1 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Movie Banner Info */}
+            <div className="flex gap-4 items-start">
+              <img
+                src={selectedTicket.image}
+                alt={selectedTicket.title}
+                className="w-20 h-28 object-cover rounded-xl border border-gray-800 shrink-0"
+              />
+              <div className="space-y-1">
+                <h3 className="font-bold text-base text-white">
+                  {selectedTicket.title}
+                </h3>
+                <p className="text-xs text-gray-400">
+                  Ref Code: <span className="font-mono text-gray-200">{selectedTicket.refCode}</span>
+                </p>
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {selectedTicket.genres.map((genre) => (
+                    <span
+                      key={genre}
+                      className="text-[10px] bg-gray-800/80 text-gray-300 px-2 py-0.5 rounded-full"
+                    >
+                      {genre}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Ticket Key Info Grid */}
+            <div className="grid grid-cols-2 gap-3 bg-[#0b0e13] p-4 rounded-xl border border-gray-800/80 text-xs">
+              <div className="flex items-center gap-2 text-gray-300">
+                <Calendar className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <span>{selectedTicket.date}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-300">
+                <Clock className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <span>{selectedTicket.time}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 col-span-2">
+                <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <span className="truncate">{selectedTicket.location}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-300">
+                <CreditCard className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <span>{selectedTicket.paymentMethod}</span>
+              </div>
+              <div className="text-gray-300 font-semibold">
+                Seats: <span className="text-red-400">{selectedTicket.seats.join(", ")}</span>
+              </div>
+            </div>
+
+            {/* Payment Summary & Status */}
+            <div className="flex items-center justify-between pt-2">
+              <div>
+                <p className="text-[10px] text-gray-400">Total Amount</p>
+                <p className="text-lg font-bold text-white">
+                  ₱{selectedTicket.amount.toFixed(2)}
+                </p>
+              </div>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  selectedTicket.status === "Completed"
+                    ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                    : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                }`}
+              >
+                {selectedTicket.status}
+              </span>
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedTicket(null)}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl text-xs transition"
+            >
+              Close Ticket
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

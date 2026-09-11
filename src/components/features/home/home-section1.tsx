@@ -1,9 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import { ChevronRight } from "lucide-react";
-import { NavLink } from "react-router";
+import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { MovieCard } from "@/components/ui/movie-card";
 
-const NOW_SHOWING_MOVIES = [
+// Extract the exact status type expected by MovieCard
+type MovieCardStatus = ComponentProps<typeof MovieCard>["status"];
+
+interface Movie {
+  id: string;
+  title: string;
+  genres: string[];
+  date: string;
+  time: string;
+  availableSeats: number;
+  totalSeats: number;
+  location: string;
+  status: MovieCardStatus;
+  image: string;
+}
+
+const NOW_SHOWING_MOVIES: Movie[] = [
   {
     id: "1",
     title: "Demon Slayer: Infinity Castle",
@@ -13,7 +27,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 120,
     totalSeats: 150,
     location: "SM City Cebu",
-    status: "Available" as const,
+    status: "Available" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop",
   },
   {
@@ -25,7 +39,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 98,
     totalSeats: 120,
     location: "Gaisano Grand",
-    status: "Available" as const,
+    status: "Available" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop",
   },
   {
@@ -37,7 +51,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 45,
     totalSeats: 100,
     location: "SM City Cebu",
-    status: "Available" as const,
+    status: "Available" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop",
   },
   {
@@ -49,7 +63,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 200,
     totalSeats: 200,
     location: "Robinsons Galleria",
-    status: "Available" as const,
+    status: "Available" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1535016120720-40c646be5580?w=500&auto=format&fit=crop",
   },
   {
@@ -61,7 +75,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 0,
     totalSeats: 120,
     location: "SM City Cebu",
-    status: "Full" as const,
+    status: "Full" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&auto=format&fit=crop",
   },
   {
@@ -73,7 +87,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 75,
     totalSeats: 120,
     location: "Gaisano Grand",
-    status: "Available" as const,
+    status: "Available" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1563089145-599997674d42?w=500&auto=format&fit=crop",
   },
   {
@@ -85,7 +99,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 110,
     totalSeats: 150,
     location: "SM City Cebu",
-    status: "Available" as const,
+    status: "Available" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&auto=format&fit=crop",
   },
   {
@@ -97,7 +111,7 @@ const NOW_SHOWING_MOVIES = [
     availableSeats: 95,
     totalSeats: 120,
     location: "Gaisano Grand",
-    status: "Available" as const,
+    status: "Available" as MovieCardStatus,
     image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop",
   },
 ];
@@ -129,7 +143,6 @@ export function HomeSection1() {
       ref={sectionRef}
       className="w-full bg-cine-bg text-white py-12 px-6 md:px-12"
     >
-      {/* Scope-contained keyframe definitions */}
       <style>{`
         @keyframes fadeInUpCard {
           from {
@@ -147,7 +160,6 @@ export function HomeSection1() {
       `}</style>
 
       <div className="container mx-auto">
-        {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
@@ -155,11 +167,8 @@ export function HomeSection1() {
             </h2>
             <div className="w-8 h-1 bg-cine-red rounded-full mt-1.5" />
           </div>
-
-          
         </div>
 
-        {/* Responsive Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
           {NOW_SHOWING_MOVIES.map((movie, index) => (
             <div
